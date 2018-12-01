@@ -23,3 +23,5 @@
 /dist/
 /nbdist/
 /.nb-gradle/h2/
+
+h2/
