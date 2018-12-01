@@ -1,6 +1,10 @@
 package com.example.demo
 
-import com.rometools.rome.feed.atom.*
+import com.rometools.rome.feed.atom.Content
+import com.rometools.rome.feed.atom.Entry
+import com.rometools.rome.feed.atom.Feed
+import com.rometools.rome.feed.atom.Link
+import com.rometools.rome.feed.atom.Person
 import com.rometools.rome.io.WireFeedOutput
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.RequestMapping
@@ -8,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.ResponseBody
 import java.io.OutputStream
 import java.io.PrintWriter
-import java.util.*
+import java.util.Base64
+import java.util.Date
+import java.util.GregorianCalendar
 
 
 @Controller
