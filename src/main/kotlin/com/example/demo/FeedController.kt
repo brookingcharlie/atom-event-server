@@ -12,14 +12,25 @@ import org.springframework.web.bind.annotation.RequestMethod
 import org.springframework.web.bind.annotation.ResponseBody
 import java.io.OutputStream
 import java.io.PrintWriter
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 import java.util.Base64
 import java.util.Date
-import java.util.GregorianCalendar
-
+import java.util.UUID
 
 @Controller
 class FeedController {
     private val baseHref = "http://localhost:8080/feed"
+    private val feedTitle = "Demo Feed"
+    private val feedAuthorName = "Demonstrations Inc"
+
+    private data class Event(val id: String, val timestamp: OffsetDateTime, val payload: String)
+    private val events: List<Event> = (0 until 10).map {
+        val eventId = UUID.randomUUID().toString()
+        val timestamp = OffsetDateTime.of(2018, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC).plusDays(it.toLong())
+        val payload = """{"foo":"Event ${eventId}"}"""
+        Event(eventId, timestamp, payload)
+    }
 
     @RequestMapping(method = [RequestMethod.GET], path = ["/feed"])
     @ResponseBody
@@ -33,26 +44,27 @@ class FeedController {
         return Feed().apply {
             feedType = "atom_1.0"
             id = "${baseHref}/"
-            title = "Demo Feed"
+            title = feedTitle
             otherLinks = listOf(Link().apply { rel = "self"; href = "${baseHref}/" })
-            authors = listOf(Person().apply { name = "QTAC" })
+            authors = listOf(Person().apply { name = feedAuthorName })
             updated = Date()
-            entries = (1..5).map { buildEntry(it) }
+            entries = events.map { buildEntry(it) }
         }
     }
 
-    private fun buildEntry(entryId: Int): Entry {
+    private fun buildEntry(event: Event): Entry {
         return Entry().apply {
-            title = "ROME v1.0"
-            id = "${baseHref}/${entryId}"
-            updated = GregorianCalendar(2004, 5, 8).time
+            title = "Event ${event.id}"
+            id = "${baseHref}/${event.id}"
+            updated = date(event.timestamp)
             contents = listOf(Content().apply {
                 type = "application/json"
-                value = base64("""{"title":"Test"}""")
+                value = base64(event.payload)
             })
-            summary = Content().apply { type = "text/plain"; value = "Entry ${entryId}" }
+            summary = Content().apply { type = "text/plain"; value = "Event ID ${event.id}" }
         }
     }
 
+    private fun date(offsetDateTime: OffsetDateTime) = Date.from(offsetDateTime.toInstant());
     private fun base64(s: String) = Base64.getEncoder().encodeToString(s.toByteArray(Charsets.UTF_8))
 }
