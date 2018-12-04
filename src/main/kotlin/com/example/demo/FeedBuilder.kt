@@ -12,12 +12,16 @@ import java.util.Date
 import java.util.UUID
 
 class FeedBuilder {
-    fun build(selfHref: String, feedTitle: String, feedAuthorName: String, events: Page<Event>): Feed {
+    fun build(baseHref: String, feedTitle: String, feedAuthorName: String, events: Page<Event>): Feed {
         return Feed().apply {
             feedType = "atom_1.0"
             id = "urn:uuid:${UUID.randomUUID()}"
             title = feedTitle
-            otherLinks = listOf(Link().apply { rel = "self"; href = "${selfHref}" })
+            otherLinks = listOfNotNull(
+                    Link().apply { rel = "self"; href = "${baseHref}" },
+                    if (!events.isFirst) Link().apply { rel = "prev-archive"; href = "${baseHref}/${events.number - 1}" } else null,
+                    if (!events.isLast) Link().apply { rel = "next-archive"; href = "${baseHref}/${events.number + 1}" } else null
+            )
             authors = listOf(Person().apply { name = feedAuthorName })
             updated = Date()
             entries = events.content.reversed().map { buildEntry(it) }
