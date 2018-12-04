@@ -5,13 +5,14 @@ import com.rometools.rome.feed.atom.Entry
 import com.rometools.rome.feed.atom.Feed
 import com.rometools.rome.feed.atom.Link
 import com.rometools.rome.feed.atom.Person
+import org.springframework.data.domain.Page
 import java.time.OffsetDateTime
 import java.util.Base64
 import java.util.Date
 import java.util.UUID
 
-class FeedBuilder() {
-    fun build(selfHref: String, feedTitle: String, feedAuthorName: String, events: List<Event>): Feed {
+class FeedBuilder {
+    fun build(selfHref: String, feedTitle: String, feedAuthorName: String, events: Page<Event>): Feed {
         return Feed().apply {
             feedType = "atom_1.0"
             id = "urn:uuid:${UUID.randomUUID()}"
@@ -19,7 +20,7 @@ class FeedBuilder() {
             otherLinks = listOf(Link().apply { rel = "self"; href = "${selfHref}" })
             authors = listOf(Person().apply { name = feedAuthorName })
             updated = Date()
-            entries = events.map { buildEntry(it) }
+            entries = events.content.reversed().map { buildEntry(it) }
         }
     }
 
