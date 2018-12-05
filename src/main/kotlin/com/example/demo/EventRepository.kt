@@ -13,10 +13,10 @@ import java.util.UUID
 
 @Repository
 class EventRepository : PagingAndSortingRepository<Event, String> {
-    val events = (0 until 50).map {
+    private val events = (0 until 11).map {
         val eventId = UUID.randomUUID().toString()
         val timestamp = OffsetDateTime.of(2018, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC).plusSeconds(it.toLong())
-        val payload = """{"foo":"Event ${eventId}"}"""
+        val payload = """{"title":"Event ${eventId}"}"""
         Event(eventId, timestamp, payload)
     }
 
@@ -75,5 +75,4 @@ class EventRepository : PagingAndSortingRepository<Event, String> {
     override fun delete(entity: Event) {
         throw NotImplementedError()
     }
-
 }
